@@ -9,7 +9,7 @@ import { adminDb } from '@/lib/firebase-admin';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { patientId, score, approved, duration, result, ...otherData } = body;
+    const { patientId, score, duration, result, ...otherData } = body;
 
     if (!patientId) {
       return NextResponse.json({ error: 'patientId is required' }, { status: 400 });
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     const newResult = {
       patientId,
       score: score || 0,
-      approved: approved || false,
+      approved: false,
       duration: duration || "00:00:00",
       result: result || {},
       ...otherData,
