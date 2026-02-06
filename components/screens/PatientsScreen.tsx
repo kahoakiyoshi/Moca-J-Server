@@ -154,7 +154,7 @@ const PatientsScreen: React.FC<PatientsScreenProps> = ({ onNavigate }) => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-36 animate-in fade-in zoom-in-95 duration-200">
-                          <DropdownMenuItem onClick={() => onNavigate('testResults', { uid: patient.uid })} className="cursor-pointer">
+                          <DropdownMenuItem onClick={() => onNavigate('testResults', { id: patient.id })} className="cursor-pointer">
                             検査結果
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => openEditModal(patient)} className="cursor-pointer">

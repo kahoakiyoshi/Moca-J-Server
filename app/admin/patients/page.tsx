@@ -8,7 +8,7 @@ export default function PatientsPage() {
 
   const handleNavigate = (name: string, params?: any) => {
     if (name === 'testResults') {
-      const query = params?.uid ? `?patientId=${params.uid}` : '';
+      const query = params?.id ? `?patientId=${params.id}` : '';
       router.push(`/admin/test-results${query}`);
     }
   };
