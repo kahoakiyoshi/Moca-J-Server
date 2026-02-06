@@ -113,7 +113,7 @@ const TestResultDetailScreen: React.FC<TestResultDetailScreenProps> = ({ id, onB
           </Button>
           <div className="flex items-center gap-3 mb-2">
             <h2 className="text-3xl font-light text-neutral-800 tracking-tight">
-              {patient ? `${patient.lastName} ${patient.firstName}` : `患者ID: ${testResult.patientId}`}
+              {patient ? `${patient.firstName} ${patient.lastName}` : `患者ID: ${testResult.patientId}`}
             </h2>
             <Badge variant="outline" className="font-mono text-[11px] text-neutral-400 border-neutral-200">UID: {testResult.uid}</Badge>
           </div>

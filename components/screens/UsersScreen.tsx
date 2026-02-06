@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Plus, MoreHorizontal } from 'lucide-react';
+import { Plus, MoreHorizontal, Loader2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -126,7 +126,12 @@ const UsersScreen: React.FC = () => {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-32 text-center text-neutral-400">読み込み中...</TableCell>
+                <TableCell colSpan={5} className="h-32 text-center text-neutral-400">
+                  <div className="flex items-center justify-center gap-2">
+                    <Loader2 className="animate-spin h-4 w-4" />
+                    読み込み中...
+                  </div>
+                </TableCell>
               </TableRow>
             ) : users.length === 0 ? (
               <TableRow>

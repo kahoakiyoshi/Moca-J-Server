@@ -38,20 +38,6 @@ export interface TestResultSummary {
   approval: string;
 }
 
-export interface TestItem {
-  no: string;
-  name: string;
-  criterion: string;
-  result: string;
-  autoScore: string;
-  score: string;
-  mocaJ: string;
-  time: string;
-  note: string;
-  btn?: string;
-  type?: string;
-}
-
 export interface TestResult {
   uid: string;
   patientId: string;
@@ -60,4 +46,19 @@ export interface TestResult {
   approved: boolean;
   duration: string;
   result: any; // JSON result
+}
+
+export interface TestItem {
+  no: string;
+  name: string;
+  result: string;
+  score: string | number;
+  note: string;
+  type?: string;
+  repairCount?: number;
+  criterion: string;
+  autoScore: string;
+  mocaJ: string;
+  time: string;
+  btn?: string;
 }
