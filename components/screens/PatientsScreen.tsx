@@ -1,0 +1,190 @@
+"use client";
+
+import React, { useState } from 'react';
+import { Plus, MoreHorizontal } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { patientService } from '@/services';
+import { usePatients } from '@/hooks/use-patients';
+import { Patient } from '@/types';
+
+interface PatientsScreenProps {
+  onNavigate: (name: string, params?: any) => void;
+}
+
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+
+interface SearchFilters {
+  id: string;
+  searchName: string;
+}
+
+import { PatientSearchForm } from './patients/PatientSearchForm';
+import { PatientEditDialog } from './patients/PatientEditDialog';
+
+const PatientsScreen: React.FC<PatientsScreenProps> = ({ onNavigate }) => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
+
+  const initialFilters = {
+    id: searchParams.get('id') || '',
+    searchName: searchParams.get('searchName') || ''
+  };
+
+  const { patients, isLoading, refetch } = usePatients({
+    id: initialFilters.id,
+    searchName: initialFilters.searchName,
+  });
+
+  const onSearchSubmit = (data: SearchFilters) => {
+    const params = new URLSearchParams();
+    if (data.id) params.set('id', data.id);
+    if (data.searchName) params.set('searchName', data.searchName);
+
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  const handleClear = () => {
+    router.push(pathname);
+  };
+
+  const openEditModal = (patient: Partial<Patient>) => {
+    setEditingPatient(patient as Patient);
+    setEditModalOpen(true);
+  };
+
+  const onSubmit = async (data: Patient) => {
+    try {
+      await patientService.savePatient(data, !editingPatient?.uid);
+      await refetch();
+      setEditModalOpen(false);
+    } catch (error: any) {
+      console.error(error);
+      alert(error.message || '保存に失敗しました');
+    }
+  };
+
+  const handleDelete = async (uid: string) => {
+    if (window.confirm('この患者データを削除してもよろしいですか？')) {
+      try {
+        await patientService.deletePatient(uid);
+        await refetch();
+      } catch (error: any) {
+        console.error(error);
+        alert(error.message || '削除に失敗しました');
+      }
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-3xl font-light text-neutral-800 tracking-tight">患者一覧</h2>
+        <Button 
+          onClick={() => openEditModal({})}
+          className="bg-[#3f65b8] hover:bg-[#345399] h-10 px-6"
+        >
+          <Plus className="mr-2 h-4 w-4" /> 新規登録
+        </Button>
+      </div>
+
+      <PatientSearchForm 
+        initialFilters={initialFilters}
+        onSearch={onSearchSubmit}
+        onClear={handleClear}
+      />
+
+      <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden shadow-sm">
+        <Table>
+          <TableHeader className="bg-neutral-50">
+            <TableRow>
+              <TableHead className="w-32 font-semibold text-neutral-600">患者ID</TableHead>
+              <TableHead className="w-48 font-semibold text-neutral-600">氏名</TableHead>
+              <TableHead className="w-24 font-semibold text-neutral-600 text-center">性別</TableHead>
+              <TableHead className="w-24 font-semibold text-neutral-600 text-center">年齢</TableHead>
+              <TableHead className="w-40 font-semibold text-neutral-600">生年月日</TableHead>
+              <TableHead className="w-16"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={6} className="h-32 text-center text-neutral-400">読み込み中...</TableCell>
+              </TableRow>
+            ) : patients.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="h-32 text-center text-neutral-400">データがありません</TableCell>
+              </TableRow>
+            ) : (
+              patients.map((patient) => {
+                const age = new Date().getFullYear() - parseInt(patient.birthYear || '2000');
+                return (
+                  <TableRow key={patient.uid} className="hover:bg-neutral-50/50 transition-colors">
+                    <TableCell className="py-4 font-medium text-neutral-700">{patient.id}</TableCell>
+                    <TableCell className="py-4 text-neutral-900">{patient.lastName} {patient.firstName}</TableCell>
+                    <TableCell className="py-4 text-center">
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${patient.gender === '女性' ? 'bg-pink-50 text-pink-700' : 'bg-blue-50 text-blue-700'}`}>
+                        {patient.gender}
+                      </span>
+                    </TableCell>
+                    <TableCell className="py-4 text-center text-neutral-600 font-medium">{age}</TableCell>
+                    <TableCell className="py-4 text-neutral-500 font-mono text-[13px]">{patient.birthYear}年{patient.birthMonth}月{patient.birthDay}日</TableCell>
+                    <TableCell className="py-4 text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-neutral-100 rounded-full">
+                            <MoreHorizontal className="h-4 w-4 text-neutral-500" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-36 animate-in fade-in zoom-in-95 duration-200">
+                          <DropdownMenuItem onClick={() => onNavigate('testResults', { uid: patient.uid })} className="cursor-pointer">
+                            検査結果
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => openEditModal(patient)} className="cursor-pointer">
+                            編集
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => handleDelete(patient.uid)} 
+                            className="text-red-500 focus:text-red-600 cursor-pointer"
+                          >
+                            削除
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      <PatientEditDialog 
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        patient={editingPatient}
+        onSubmit={onSubmit}
+      />
+    </div>
+  );
+};
+
+export default PatientsScreen;
