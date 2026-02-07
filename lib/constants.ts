@@ -52,10 +52,8 @@ export const alls_test: Record<string, string> = {
   "subtraction_task_step_4": "注意 計算",
   "subtraction_task_step_5": "注意 計算",
 
-  "sentence_repetition": "復唱 設問1",
-  "sentence_repetition_status": "復唱 設問1",
-
-  "sentence_task_step_1": "復唱 設問2",
+  "sentence_task_step_1": "復唱 設問1",
+  "sentence_task_step_2": "復唱 設問2",
 
   "similarity_task": "抽象的思考 設問1",
 
