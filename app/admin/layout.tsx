@@ -139,7 +139,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Main Content */}
       <main className={`flex-1 pt-16 transition-all duration-300 bg-neutral-50/30 ${sidebarOpen ? 'ml-64' : 'ml-0'}`}>
-        <div className="p-8 max-w-7xl mx-auto h-full flex flex-col overflow-y-auto">
+        <div className={`p-8 h-full flex flex-col overflow-y-auto ${sidebarOpen ? 'w-[calc(100vw-256px)]' : 'w-[calc(100vw)]'}`}>
           {children}
         </div>
       </main>

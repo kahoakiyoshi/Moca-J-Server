@@ -95,7 +95,7 @@ const UsersScreen: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-3xl font-light text-neutral-800 tracking-tight">病院ユーザー</h2>
         <Button
@@ -112,7 +112,7 @@ const UsersScreen: React.FC = () => {
         onClear={handleClear}
       />
 
-      <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden shadow-sm">
+      <div className="rounded-xl border border-neutral-200 bg-white shadow-sm">
         <Table>
           <TableHeader className="bg-neutral-50">
             <TableRow>

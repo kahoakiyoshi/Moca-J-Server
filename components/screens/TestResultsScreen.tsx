@@ -70,7 +70,7 @@ const TestResultsScreen: React.FC<TestResultsScreenProps> = ({ onNavigate }) => 
   };
 
   return (
-    <div className="flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500">
       <h2 className="text-3xl font-light text-neutral-800 mb-8 tracking-tight">検査結果一覧</h2>
 
       <TestResultsSearchForm
@@ -80,7 +80,7 @@ const TestResultsScreen: React.FC<TestResultsScreenProps> = ({ onNavigate }) => 
       />
 
 
-      <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden shadow-sm">
+      <div className="rounded-xl border border-neutral-200 bg-white shadow-sm">
         <Table>
           <TableHeader className="bg-neutral-50">
             <TableRow>

@@ -53,12 +53,25 @@ export interface TestItem {
   name: string;
   result: string;
   score: string | number;
-  note: string;
-  type?: string;
+  value: string | {
+    ids: string[];
+    repairCount: number;
+  };
   repairCount?: number;
   criterion: string;
   autoScore: string;
   mocaJ: string;
   time: string;
   btn?: string;
+  taskKey?: string;
+  answer: string | {
+    ids: string[];
+    repairCount: number;
+  } | any;
+  judgmentCriteria: string;
+  questionKey: string;
+  gpsDetail?: string;
+  isCorrect?: boolean;
+  durationStr?: string;
+  tapSummary?: string;
 }

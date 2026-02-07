@@ -31,12 +31,16 @@ export const TestResultItemDialog: React.FC<TestResultItemDialogProps> = ({
 
   const renderTest = (item: TestItem | null) => {
     if (!item) return 'データが存在しません';
-    switch (item.type) {
+    const val = item.value;
+    switch (item.taskKey) {
       case 'node_test':
-        const nodes = JSON.parse(item.note);
-        return "入力: " + nodes.join('→');
+        if (typeof val === 'object' && 'ids' in val) {
+          return "入力: " + val.ids?.join('→');
+        }
+        return "入力: " + (typeof val === 'object' ? JSON.stringify(val) : val);
       case 'drawing_test':
-        const paths = JSON.parse(item.note);
+        const paths = val as any;
+        if (!Array.isArray(paths)) return '';
         return <svg className='text-9xl' width={"1em"} height={"1em"} viewBox="0 0 300 300">
           {paths.map((path: any, index: number) => (
             <path
@@ -51,48 +55,48 @@ export const TestResultItemDialog: React.FC<TestResultItemDialogProps> = ({
           ))}
         </svg>
       case 'shape_recall':
-        return item?.note ? <img src={SHAPE_RECALL_IMAGE[JSON.parse(item?.note) as keyof typeof SHAPE_RECALL_IMAGE]} className='w-[100px] h-[100px]' alt="" /> : ''
+        return val ? <img src={SHAPE_RECALL_IMAGE[val as keyof typeof SHAPE_RECALL_IMAGE]} className='w-[100px] h-[100px]' alt="" /> : ''
       case 'shape_match':
-        return item?.note ? <img src={SHAPE_MATCHING_IMAGE[JSON.parse(item?.note) as keyof typeof SHAPE_MATCHING_IMAGE]} className='w-[100px] h-[100px]' alt="" /> : ''
+        return val ? <img src={SHAPE_MATCHING_IMAGE[val as keyof typeof SHAPE_MATCHING_IMAGE]} className='w-[100px] h-[100px]' alt="" /> : ''
       case 'simple_shape_selection':
-        if (!item.note) return '';
+        if (!val) return '';
         try {
-          const shapeType = JSON.parse(item.note);
+          const shapeType = val as string;
           return renderShape(shapeType);
         } catch (e) {
-          return item.note;
+          return typeof val === 'object' ? JSON.stringify(val) : val;
         }
       case 'clock_validation':
-        return item?.note;
+        return typeof val === 'object' ? JSON.stringify(val) : val;
       case 'word_recall':
-        return item?.note ? "入力: " + JSON.parse(item?.note)?.join(',') : '';
+        return Array.isArray(val) ? "入力: " + val.join(',') : typeof val === 'object' ? JSON.stringify(val) : val;
       case 'sequence_recall':
-        const sequence_recall = JSON.parse(item.note) ?? "";
+        const sequence_recall = (typeof val === 'string' ? val : JSON.stringify(val)) ?? "";
         return "入力: " + sequence_recall?.split("")?.join('→');
       case 'letter_tap_task':
-        return item?.note;
+        return typeof val === 'object' ? JSON.stringify(val) : val;
       case 'subtraction_task':
-        return item?.note;
+        return typeof val === 'object' ? JSON.stringify(val) : val;
       case 'sentence_task':
-        return item?.note;
+        return typeof val === 'object' ? JSON.stringify(val) : val;
       case 'fluency_task':
-        return item?.note ? "入力: " + JSON.parse(item?.note)?.join(',') : '';
+        return Array.isArray(val) ? "入力: " + val.join(',') : typeof val === 'object' ? JSON.stringify(val) : val;
       case 'similarity_task':
-        return "入力: " + item?.note;
+        return "入力: " + (typeof val === 'object' ? JSON.stringify(val) : val);
       default:
-        return item.note ? item.note : 'データが存在しません';
+        return typeof val === 'object' ? JSON.stringify(val) : (val || 'データが存在しません');
     }
   }
 
   const renderReference = (item: TestItem | null) => {
     if (!item) return 'データが存在しません';
-    switch (item.type) {
+    switch (item.taskKey) {
       case 'node_test':
-        return "自己修復回数: " + item?.repairCount || 0;
+        return "自己修復回数: " + (item?.repairCount || 0);
       case 'drawing_test':
         return '';
       default:
-        return item.note ? item.note : 'データが存在しません';
+        return typeof item.value === 'object' ? JSON.stringify(item.value) : (item.value || 'データが存在しません');
     }
   }
 
