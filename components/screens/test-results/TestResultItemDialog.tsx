@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Info } from 'lucide-react';
+import { Info, Check, X } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -9,6 +9,13 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -21,14 +28,21 @@ interface TestResultItemDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   item: TestItem | null;
+  onUpdate?: (updatedItem: TestItem) => void;
 }
 
 export const TestResultItemDialog: React.FC<TestResultItemDialogProps> = ({
   open,
   onOpenChange,
   item,
+  onUpdate,
 }) => {
 
+  console.log(item)
+
+  const renderValue = (val: any) => {
+    return typeof val === 'object' ? JSON.stringify(val) : val;
+  }
   const renderTest = (item: TestItem | null) => {
     if (!item) return 'データが存在しません';
     const val = item.value;
@@ -41,7 +55,7 @@ export const TestResultItemDialog: React.FC<TestResultItemDialogProps> = ({
       case 'drawing_test':
         const paths = val as any;
         if (!Array.isArray(paths)) return '';
-        return <svg className='text-9xl' width={"1em"} height={"1em"} viewBox="0 0 300 300">
+        return <svg className='text-[300px] w-[300px] h-[300px]' viewBox="0 0 300 300">
           {paths.map((path: any, index: number) => (
             <path
               key={index}
@@ -64,24 +78,30 @@ export const TestResultItemDialog: React.FC<TestResultItemDialogProps> = ({
           const shapeType = val as string;
           return renderShape(shapeType);
         } catch (e) {
-          return typeof val === 'object' ? JSON.stringify(val) : val;
+          return renderValue(val)
         }
       case 'clock_validation':
-        return typeof val === 'object' ? JSON.stringify(val) : val;
+        return renderValue(val)
       case 'word_recall':
-        return Array.isArray(val) ? "入力: " + val.join(',') : typeof val === 'object' ? JSON.stringify(val) : val;
+        return Array.isArray(item?.answer) ? "入力: " + item?.answer.join(',') : renderValue(val)
       case 'sequence_recall':
         const sequence_recall = (typeof val === 'string' ? val : JSON.stringify(val)) ?? "";
         return "入力: " + sequence_recall?.split("")?.join('→');
-      case 'letter_tap_task':
-        return typeof val === 'object' ? JSON.stringify(val) : val;
       case 'subtraction_task':
-        return typeof val === 'object' ? JSON.stringify(val) : val;
+        return renderValue(val)
+      case 'delayed_recall':
+        return item?.questionKey === 'free_recall' ? renderValue(val) : "入力: " + item?.answer
       case 'sentence_task':
-        return typeof val === 'object' ? JSON.stringify(val) : val;
+        return item?.answer;
+      case 'letter_tap_task':
+        return item?.tapSummary;
+      case 'naming_task':
+        return "入力: " + (typeof val === 'object' ? JSON.stringify(val) : val);
       case 'fluency_task':
-        return Array.isArray(val) ? "入力: " + val.join(',') : typeof val === 'object' ? JSON.stringify(val) : val;
+        return Array.isArray(val) ? "入力: " + val.join(',') : renderValue(val)
       case 'similarity_task':
+        return "入力: " + (typeof val === 'object' ? JSON.stringify(val) : val);
+      case 'orientation_task':
         return "入力: " + (typeof val === 'object' ? JSON.stringify(val) : val);
       default:
         return typeof val === 'object' ? JSON.stringify(val) : (val || 'データが存在しません');
@@ -91,8 +111,51 @@ export const TestResultItemDialog: React.FC<TestResultItemDialogProps> = ({
   const renderReference = (item: TestItem | null) => {
     if (!item) return 'データが存在しません';
     switch (item.taskKey) {
+      case 'clock_validation':
+        return '';
+      case 'subtraction_task':
+        return '';
+      case 'shape_recall':
+        return '';
+      case 'shape_match':
+        return '';
+      case 'simple_shape_selection':
+        return '';
+      case 'naming_task':
+        return '';
+      case 'word_recall':
+        return '';
+      case 'sequence_recall':
+        return '';
+      case 'sentence_task':
+        return '';
+      case 'similarity_task':
+        return '';
+      case 'delayed_recall':
+        return '';
+      case 'orientation_task':
+        return <>
+          <span className="leading-relaxed break-all">
+            {item.questionKey === 'step_1' ? '端末年: ' : ''}
+            {item.questionKey === 'step_2' ? '端末月: ' : ''}
+            {item.questionKey === 'step_3' ? '端末日: ' : ''}
+            {item.questionKey === 'step_4' ? '端末曜日: ' : ''}
+            {item.questionKey === 'step_5' ? '端末時間: ' : ''}
+            {item.questionKey === 'step_6' ? '端末季節: ' : ''}
+            {!(item.questionKey === 'step_7' || item.questionKey === 'step_8') && typeof item.answer === 'string' ? item.answer && item.answer != 'unknown' ? item.answer : '' : ''}
+            {
+              (item.questionKey === 'step_7' || item.questionKey === 'step_8') && (
+                <span className="leading-relaxed break-all">
+                  {item.gpsDetail}
+                </span>
+              )
+            }
+          </span>
+        </>;
       case 'node_test':
         return "自己修復回数: " + (item?.repairCount || 0);
+      case 'letter_tap_task':
+        return item?.tapSummary;
       case 'drawing_test':
         return '';
       default:
@@ -125,24 +188,48 @@ export const TestResultItemDialog: React.FC<TestResultItemDialogProps> = ({
 
           <Separator className="bg-neutral-100 mb-5" />
 
-          <div className="grid grid-cols-2 gap-8 px-2">
-            <div className="space-y-1">
-              <Label className="text-base font-bold text-neutral-400 uppercase tracking-widest">判定結果</Label>
-              <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${item?.result === 'OK' ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                <span className="text-base font-bold text-neutral-900">{item?.result}</span>
+          <div className="space-y-4 pb-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-bold text-neutral-400 uppercase tracking-widest">判定の修正</Label>
+              <div className="flex items-baseline gap-1">
+                <span className="text-3xl font-black text-[#3f65b8]">{item?.score || '0'}</span>
+                <span className="text-xs font-bold text-neutral-400">点</span>
               </div>
             </div>
-            <div className="space-y-1">
-              <Label className="text-base font-bold text-neutral-400 uppercase tracking-widest">スコア</Label>
-              <div className="text-2xl font-black text-[#3f65b8] leading-none">
-                {item?.score || '0'}<span className="text-sm font-normal text-neutral-400 ml-1">点</span>
-              </div>
-            </div>
+
+            <Select
+              value={item?.isCorrect === true ? "true" : "false"}
+              onValueChange={(val) => {
+                if (!item || !onUpdate) return;
+                const isCorrect = val === "true";
+                if (item.isCorrect === isCorrect) return;
+
+                const currentScore = Number(item.score) || 0;
+                const newScore = isCorrect ? currentScore + 1 : Math.max(0, currentScore - 1);
+
+                onUpdate({
+                  ...item,
+                  isCorrect: isCorrect,
+                  score: newScore
+                });
+              }}
+            >
+              <SelectTrigger className="w-full h-12 bg-neutral-50 border-neutral-200 rounded-xl font-bold">
+                <SelectValue placeholder="判定を選択" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-neutral-200 shadow-xl">
+                <SelectItem value="true" className="focus:bg-emerald-50 focus:text-emerald-700 py-3 font-bold cursor-pointer">
+                  OK
+                </SelectItem>
+                <SelectItem value="false" className="focus:bg-red-50 focus:text-red-700 py-3 font-bold cursor-pointer">
+                  NG
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <DialogFooter className="p-6 bg-neutral-50 border-t border-neutral-100">
-          <Button onClick={() => onOpenChange(false)} className="w-full bg-neutral-900 hover:bg-black text-white px-8 h-11 font-bold rounded-xl shadow-lg transition-all active:scale-95">
+          <Button onClick={() => onOpenChange(false)} className="w-full hover:bg-black text-white px-8 h-11 font-bold rounded-xl shadow-lg transition-all active:scale-95">
             閉じる
           </Button>
         </DialogFooter>

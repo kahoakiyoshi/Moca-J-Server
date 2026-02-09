@@ -59,6 +59,32 @@ const TestResultDetailScreen: React.FC<TestResultDetailScreenProps> = ({ id, onB
     setConfirmModalOpen(true);
   };
 
+  const handleUpdateItem = async (updatedItem: TestItem) => {
+    if (!testResult) return;
+    
+    // Create copy of result array and update the specific item
+    const updatedResult = items.map((item: TestItem) => 
+      (item.taskKey === updatedItem.taskKey && item.questionKey === updatedItem.questionKey) 
+        ? updatedItem 
+        : item
+    );
+
+    // Calculate new total score from all items
+    const newTotalScore = updatedResult.reduce((sum: number, item: TestItem) => sum + (Number(item.score) || 0), 0);
+
+    try {
+      await testResultService.updateTestResult(testResult.uid, { 
+        result: updatedResult,
+        score: newTotalScore
+      });
+      setSelectedItem(updatedItem); // Update local selected state to show changes in dialog
+      await refetch();
+    } catch (error) {
+      console.error(error);
+      alert('更新に失敗しました');
+    }
+  };
+
 
   if (isLoading) {
     return (
@@ -102,7 +128,7 @@ const TestResultDetailScreen: React.FC<TestResultDetailScreenProps> = ({ id, onB
           </Button>
           <div className="flex items-center gap-3 mb-2">
             <h2 className="text-3xl font-light text-neutral-800 tracking-tight">
-              {patient ? `${patient.firstName} ${patient.lastName}` : `患者ID: ${testResult.patientId}`}
+              {patient ? `${patient.lastName} ${patient.firstName}` : `患者ID: ${testResult.patientId}`}
             </h2>
             <Badge variant="outline" className="font-mono text-[11px] text-neutral-400 border-neutral-200">UID: {testResult.uid}</Badge>
           </div>
@@ -202,7 +228,6 @@ const TestResultDetailScreen: React.FC<TestResultDetailScreenProps> = ({ id, onB
           </TableHeader>
           <TableBody>
             {items.map((item: TestItem, idx: number) => {
-              console.log(item)
               return (
                 <TableRow key={idx} className="hover:bg-neutral-50/50 transition-colors">
                   <TableCell className="font-mono text-neutral-400">{idx + 1}</TableCell>
@@ -224,7 +249,7 @@ const TestResultDetailScreen: React.FC<TestResultDetailScreenProps> = ({ id, onB
                   <TableCell className="text-neutral-500 font-medium">{item.durationStr}</TableCell>
                   <TableCell className="max-w-56">
                     <p className="text-[11px] text-neutral-400 line-clamp-2 leading-relaxed break-all">
-                      {/* {item.taskKey !== 'node_test' && item.taskKey !== "drawing_test" && (typeof item.value === 'object' ? JSON.stringify(item.value) : item.value)} */}
+                      {item.taskKey === 'node_test' && (typeof item.value === 'object' ? `自己修復回数: ${item.value?.repairCount || 0}` : '')}
                       {
                         item.taskKey === 'orientation_task' && (item.questionKey === 'step_7' || item.questionKey === 'step_8') && (
                           <span className="text-[11px] text-neutral-400 line-clamp-2 leading-relaxed break-all">
@@ -318,6 +343,7 @@ const TestResultDetailScreen: React.FC<TestResultDetailScreenProps> = ({ id, onB
         open={confirmModalOpen}
         onOpenChange={setConfirmModalOpen}
         item={selectedItem}
+        onUpdate={handleUpdateItem}
       />
     </div>
   );
