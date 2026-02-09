@@ -40,6 +40,37 @@ const TestResultDetailScreen: React.FC<TestResultDetailScreenProps> = ({ id, onB
     return testResult.result ?? [];
   }, [testResult]);
 
+  const totalDuration = useMemo(() => {
+    if (!items.length) return "00:00";
+
+    let totalSeconds = 0;
+    items.forEach(item => {
+      // Use durationStr or time field
+      const timeStr = item.durationStr || item.time || "00:00";
+      const parts = timeStr.split(':').map((val: string) => parseInt(val, 10) || 0);
+
+      if (parts.length === 3) {
+        // HH:MM:SS
+        totalSeconds += parts[0] * 3600 + parts[1] * 60 + parts[2];
+      } else if (parts.length === 2) {
+        // MM:SS
+        totalSeconds += parts[0] * 60 + parts[1];
+      }
+    });
+
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
+
+    const mm = String(m).padStart(2, '0');
+    const ss = String(s).padStart(2, '0');
+
+    if (h > 0) {
+      return `${String(h).padStart(2, '0')}:${mm}:${ss}`;
+    }
+    return `${mm}:${ss}`;
+  }, [items]);
+
   const handleApprove = async () => {
     if (!testResult) return;
     setIsUpdating(true);
@@ -61,11 +92,11 @@ const TestResultDetailScreen: React.FC<TestResultDetailScreenProps> = ({ id, onB
 
   const handleUpdateItem = async (updatedItem: TestItem) => {
     if (!testResult) return;
-    
+
     // Create copy of result array and update the specific item
-    const updatedResult = items.map((item: TestItem) => 
-      (item.taskKey === updatedItem.taskKey && item.questionKey === updatedItem.questionKey) 
-        ? updatedItem 
+    const updatedResult = items.map((item: TestItem) =>
+      (item.taskKey === updatedItem.taskKey && item.questionKey === updatedItem.questionKey)
+        ? updatedItem
         : item
     );
 
@@ -73,7 +104,7 @@ const TestResultDetailScreen: React.FC<TestResultDetailScreenProps> = ({ id, onB
     const newTotalScore = updatedResult.reduce((sum: number, item: TestItem) => sum + (Number(item.score) || 0), 0);
 
     try {
-      await testResultService.updateTestResult(testResult.uid, { 
+      await testResultService.updateTestResult(testResult.uid, {
         result: updatedResult,
         score: newTotalScore
       });
@@ -88,7 +119,7 @@ const TestResultDetailScreen: React.FC<TestResultDetailScreenProps> = ({ id, onB
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center h-[60vh] text-neutral-400 gap-3">
+      <div className="flex flex-col items-center justify-center h-[60vh]  gap-3">
         <Loader2 className="animate-spin h-8 w-8 text-[#3f65b8]" />
         <p>結果を読み込み中...</p>
       </div>
@@ -100,7 +131,7 @@ const TestResultDetailScreen: React.FC<TestResultDetailScreenProps> = ({ id, onB
       <div className="text-center py-20 bg-white rounded-xl border border-red-100 shadow-sm">
         <AlertTriangle className="mx-auto h-12 w-12 text-red-500 mb-4" />
         <h3 className="text-lg font-bold text-neutral-800">エラーが発生しました</h3>
-        <p className="text-neutral-500 mt-2">{error.message}</p>
+        <p className=" mt-2">{error.message}</p>
         <Button variant="outline" onClick={() => refetch()} className="mt-6">もう一度試す</Button>
         <Button variant="link" onClick={onBack} className="mt-2 block mx-auto">戻る</Button>
       </div>
@@ -112,8 +143,8 @@ const TestResultDetailScreen: React.FC<TestResultDetailScreenProps> = ({ id, onB
       <div className="text-center py-20 bg-white rounded-xl border border-neutral-100 shadow-sm">
         <Info className="mx-auto h-12 w-12 text-neutral-300 mb-4" />
         <h3 className="text-lg font-bold text-neutral-800">データが見つかりませんでした</h3>
-        <p className="text-neutral-500 mt-2">ID: <span className="font-mono">{id}</span></p>
-        <p className="text-neutral-400 text-sm mt-1">Firestoreに該当するドキュメントが存在しないか、アクセス権限がありません。</p>
+        <p className=" mt-2">ID: <span className="font-mono">{id}</span></p>
+        <p className=" text-sm mt-1">Firestoreに該当するドキュメントが存在しないか、アクセス権限がありません。</p>
         <Button variant="link" onClick={onBack} className="mt-6">検査結果一覧へ戻る</Button>
       </div>
     );
@@ -123,17 +154,17 @@ const TestResultDetailScreen: React.FC<TestResultDetailScreenProps> = ({ id, onB
     <div className="flex flex-col animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-start justify-between mb-4">
         <div>
-          <Button variant="ghost" onClick={onBack} className="mb-4 pl-0 text-neutral-500 hover:text-neutral-900 transition-colors">
+          <Button variant="ghost" onClick={onBack} className="mb-4 pl-0  hover:text-neutral-900 transition-colors">
             <ChevronLeft className="mr-1 h-4 w-4" /> 検査結果一覧へ戻る
           </Button>
           <div className="flex items-center gap-3 mb-2">
             <h2 className="text-3xl font-light text-neutral-800 tracking-tight">
               {patient ? `${patient.lastName} ${patient.firstName}` : `患者ID: ${testResult.patientId}`}
             </h2>
-            <Badge variant="outline" className="font-mono text-[11px] text-neutral-400 border-neutral-200">UID: {testResult.uid}</Badge>
+            <Badge variant="outline" className="font-mono text-sm  border-neutral-200">UID: {testResult.uid}</Badge>
           </div>
           {patient && (
-            <p className="text-neutral-500 text-sm font-medium">
+            <p className=" text-sm font-medium">
               {new Date().getFullYear() - parseInt(patient.birthYear)}歳 · {patient.gender} · {patient.birthYear}-{patient.birthMonth}-{patient.birthDay}生
               <br />
               最終学歴: {patient.education === '12' ? '高卒' : '高卒より上'}
@@ -142,7 +173,7 @@ const TestResultDetailScreen: React.FC<TestResultDetailScreenProps> = ({ id, onB
         </div>
         <Card className="min-w-[200px] border-neutral-100 bg-white shadow-sm">
           <CardHeader className="py-2 bg-neutral-50/50">
-            <CardTitle className="text-[10px] uppercase tracking-widest text-neutral-400 font-bold">Total Score</CardTitle>
+            <CardTitle className="text-sm uppercase tracking-widest  font-bold">Total Score</CardTitle>
           </CardHeader>
           <CardContent className="py-2">
             <div className="text-3xl font-bold text-[#3f65b8] tracking-tighter">{testResult.score}/30点</div>
@@ -174,23 +205,23 @@ const TestResultDetailScreen: React.FC<TestResultDetailScreenProps> = ({ id, onB
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <Card className="border-neutral-100 shadow-sm border-l-2 border-l-[#3f65b8]">
           <CardContent className="p-4 flex items-center gap-4">
-            <div className="bg-neutral-50 p-2 rounded-full text-neutral-400">
+            <div className="bg-neutral-50 p-2 rounded-full ">
               <Calendar size={20} />
             </div>
             <div>
-              <p className="text-[10px] text-neutral-400 font-bold uppercase">検査実施日時</p>
+              <p className="text-sm  font-bold uppercase">検査実施日時</p>
               <p className="text-sm font-medium text-neutral-700">{formatDate(testResult.created_at)}</p>
             </div>
           </CardContent>
         </Card>
         <Card className="border-neutral-100 shadow-sm border-l-2 border-l-emerald-500">
           <CardContent className="p-4 flex items-center gap-4">
-            <div className="bg-neutral-50 p-2 rounded-full text-neutral-400">
+            <div className="bg-neutral-50 p-2 rounded-full ">
               <Clock size={20} />
             </div>
             <div>
-              <p className="text-[10px] text-neutral-400 font-bold uppercase">所要時間</p>
-              <p className="text-sm font-bold text-neutral-700">{testResult.duration}</p>
+              <p className="text-sm  font-bold uppercase">所要時間</p>
+              <p className="text-sm font-bold text-neutral-700">{totalDuration}</p>
             </div>
           </CardContent>
         </Card>
@@ -200,7 +231,7 @@ const TestResultDetailScreen: React.FC<TestResultDetailScreenProps> = ({ id, onB
               {testResult.approved ? <Info size={20} /> : <AlertTriangle size={20} />}
             </div>
             <div className="flex-1">
-              <p className={`text-[10px] font-bold uppercase ${testResult.approved ? 'text-emerald-600' : 'text-amber-600'}`}>ステータス</p>
+              <p className={`text-sm font-bold uppercase ${testResult.approved ? 'text-emerald-600' : 'text-amber-600'}`}>ステータス</p>
               <p className={`text-sm font-bold ${testResult.approved ? 'text-emerald-700' : 'text-amber-700'}`}>
                 {testResult.approved ? '承認済' : '承認待ち'}
               </p>
@@ -213,60 +244,59 @@ const TestResultDetailScreen: React.FC<TestResultDetailScreenProps> = ({ id, onB
         <Table className="text-[13px]">
           <TableHeader className="bg-neutral-50">
             <TableRow className="hover:bg-transparent">
-              <TableHead className="w-12 font-bold text-neutral-500 uppercase text-sm">No</TableHead>
-              <TableHead className="font-bold text-neutral-500 uppercase text-sm">検査項目名</TableHead>
-              <TableHead className="w-[130px] min-w-[130px] max-w-[130px] text-center font-bold text-neutral-500 uppercase text-sm">判定基準</TableHead>
-              <TableHead className="hidden lg:table-cell font-bold text-neutral-500 uppercase text-sm">判定結果</TableHead>
-              <TableHead className="text-center font-bold text-neutral-500 uppercase text-sm">自動判定スコア</TableHead>
-              <TableHead className="text-center font-bold text-neutral-500 uppercase text-sm">スコア</TableHead>
-              <TableHead className="text-center font-bold text-neutral-500 uppercase text-sm">MoCA-J</TableHead>
-              <TableHead className="font-bold text-neutral-500 uppercase text-sm">回答時間</TableHead>
-              <TableHead className="font-bold text-neutral-500 uppercase text-sm w-64">参考情報</TableHead>
-              <TableHead className="w-24 text-center">確認/修正</TableHead>
-              <TableHead className="w-24 text-center">更新日</TableHead>
+              <TableHead className="w-12 font-bold  uppercase text-sm text-neutral-600">No</TableHead>
+              <TableHead className="font-bold  uppercase text-sm text-neutral-600">検査項目名</TableHead>
+              <TableHead className="w-[130px] min-w-[130px] max-w-[130px] text-center font-bold  uppercase text-sm text-neutral-600">判定基準</TableHead>
+              <TableHead className="hidden lg:table-cell font-bold  uppercase text-sm text-neutral-600">判定結果</TableHead>
+              <TableHead className="text-center font-bold  uppercase text-sm text-neutral-600">自動判定スコア</TableHead>
+              <TableHead className="text-center font-bold  uppercase text-sm text-neutral-600">スコア</TableHead>
+              <TableHead className="text-center font-bold  uppercase text-sm text-neutral-600">MoCA-J</TableHead>
+              <TableHead className="font-bold  uppercase text-sm text-neutral-600">回答時間</TableHead>
+              <TableHead className="font-bold  uppercase text-sm text-neutral-600 w-64">参考情報</TableHead>
+              <TableHead className="w-24 text-center text-neutral-600">確認/修正</TableHead>
+              <TableHead className="w-24 text-center text-neutral-600">更新日</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {items.map((item: TestItem, idx: number) => {
               return (
                 <TableRow key={idx} className="hover:bg-neutral-50/50 transition-colors">
-                  <TableCell className="font-mono text-neutral-400">{idx + 1}</TableCell>
-                  <TableCell className="font-bold text-neutral-800">
+                  <TableCell className="font-mono text-neutral-500">{idx + 1}</TableCell>
+                  <TableCell className="font-bold text-neutral-600">
                     {alls_test[`${item.taskKey}_${item.questionKey}`]}
                   </TableCell>
-                  <TableCell className="text-center whitespace-pre-wrap">
+                  <TableCell className="text-center whitespace-pre-wrap text-neutral-500">
                     {item.judgmentCriteria}
                   </TableCell>
-                  <TableCell className="hidden lg:table-cell text-neutral-400 text-[11px]">{item.isCorrect ? 'OK' : 'NG'}</TableCell>
-                  <TableCell className="text-center font-semibold text-neutral-500">{item.autoScore ? item.autoScore : item.score}</TableCell>
+                  <TableCell className="hidden lg:table-cell  text-neutral-500 text-sm">{item.isCorrect ? 'OK' : 'NG'}</TableCell>
+                  <TableCell className="text-center font-semibold text-neutral-500">{item.score_auto ? item.score_auto : item.score}</TableCell>
                   <TableCell className="text-center font-bold text-neutral-900">{item.score}</TableCell>
-                  <TableCell className="text-center">
-                    <span className={`inline-block w-5 h-5 rounded-full text-center leading-5 text-[11px] font-bold`}>
-                      {item.mocaJ}
-                      {/* '○' or '△' or '×' */}
+                  <TableCell className="text-center text-neutral-500">
+                    <span className={`inline-block w-5 h-5 rounded-full text-center leading-5 text-neutral-500 text-sm font-bold`}>
+                      {item?.taskKey === 'orientation_task' && (item?.questionKey === 'step_7' || item?.questionKey === 'step_8') ? '△' : (item.isCorrect ? '○' : '×')}
                     </span>
                   </TableCell>
                   <TableCell className="text-neutral-500 font-medium">{item.durationStr}</TableCell>
-                  <TableCell className="max-w-56">
-                    <p className="text-[11px] text-neutral-400 line-clamp-2 leading-relaxed break-all">
+                  <TableCell className="max-w-56 text-neutral-500">
+                    <p className="text-sm  line-clamp-2 leading-relaxed break-all">
                       {item.taskKey === 'node_test' && (typeof item.value === 'object' ? `自己修復回数: ${item.value?.repairCount || 0}` : '')}
                       {
                         item.taskKey === 'orientation_task' && (item.questionKey === 'step_7' || item.questionKey === 'step_8') && (
-                          <span className="text-[11px] text-neutral-400 line-clamp-2 leading-relaxed break-all">
+                          <span className="text-sm  line-clamp-2 leading-relaxed break-all">
                             {item.gpsDetail}
                           </span>
                         )
                       }
                       {
                         item.taskKey === 'node_test' && (
-                          <span className="text-[11px] text-neutral-400 line-clamp-2 leading-relaxed break-all">
+                          <span className="text-sm  line-clamp-2 leading-relaxed break-all">
                             {typeof item.answer === 'object' ? `自己修復回数: ${item.answer.repairCount}` : ''}
                           </span>
                         )
                       }
                       {
                         item.taskKey == 'orientation_task' && (
-                          <span className="text-[11px] text-neutral-400 line-clamp-2 leading-relaxed break-all">
+                          <span className="text-sm  line-clamp-2 leading-relaxed break-all">
                             {item.questionKey === 'step_1' ? '端末年: ' : ''}
                             {item.questionKey === 'step_2' ? '端末月: ' : ''}
                             {item.questionKey === 'step_3' ? '端末日: ' : ''}
@@ -279,42 +309,42 @@ const TestResultDetailScreen: React.FC<TestResultDetailScreenProps> = ({ id, onB
                       }
                       {
                         item.taskKey == 'delayed_recall' && (
-                          <span className="text-[11px] text-neutral-400 line-clamp-2 leading-relaxed break-all">
+                          <span className="text-sm  line-clamp-2 leading-relaxed break-all">
                             正解単語: {typeof item.value === 'string' ? item.value && item.value != 'unknown' ? item.value : '' : ''}
                           </span>
                         )
                       }
                       {
                         item.taskKey == 'fluency_task' && (
-                          <span className="text-[11px] text-neutral-400 line-clamp-2 leading-relaxed break-all">
+                          <span className="text-sm  line-clamp-2 leading-relaxed break-all">
                             入力: {typeof item.answer === 'object' ? item.answer.join(', ') : ''}
                           </span>
                         )
                       }
                       {
                         item.taskKey == 'letter_tap_task' && (
-                          <span className="text-[11px] text-neutral-400 line-clamp-2 leading-relaxed break-all whitespace-pre-wrap">
+                          <span className="text-sm  line-clamp-2 leading-relaxed break-all whitespace-pre-wrap">
                             {item.tapSummary}
                           </span>
                         )
                       }
                       {
                         item.taskKey == 'naming_task' && (
-                          <span className="text-[11px] text-neutral-400 line-clamp-2 leading-relaxed break-all whitespace-pre-wrap">
+                          <span className="text-sm  line-clamp-2 leading-relaxed break-all whitespace-pre-wrap">
                             入力内容:{item.answer}
                           </span>
                         )
                       }
                       {
                         item.taskKey == 'word_recall' && (
-                          <span className="text-[11px] text-neutral-400 line-clamp-2 leading-relaxed break-all whitespace-pre-wrap">
+                          <span className="text-sm  line-clamp-2 leading-relaxed break-all whitespace-pre-wrap">
                             {typeof item.value === 'string' ? item.value : ''}
                           </span>
                         )
                       }
                       {
                         item.taskKey == 'similarity_task' && (
-                          <span className="text-[11px] text-neutral-400 line-clamp-2 leading-relaxed break-all whitespace-pre-wrap">
+                          <span className="text-sm  line-clamp-2 leading-relaxed break-all whitespace-pre-wrap">
                             入力内容:{item.answer}
                           </span>
                         )
@@ -326,7 +356,7 @@ const TestResultDetailScreen: React.FC<TestResultDetailScreenProps> = ({ id, onB
                       variant="outline"
                       size="sm"
                       onClick={() => handleOpenConfirm(item)}
-                      className="h-7 px-3 text-[11px] font-bold bg-white hover:bg-neutral-50 border-neutral-200 transition-all active:scale-95"
+                      className="h-7 px-3 text-sm font-bold bg-white hover:bg-neutral-50 border-neutral-200 transition-all active:scale-95"
                     >
                       {item.btn || '確認'}
                     </Button>

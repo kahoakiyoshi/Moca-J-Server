@@ -30,7 +30,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="flex h-screen items-center justify-center bg-white text-gray-400">Loading...</div>}>
+    <Suspense fallback={<div className="flex h-screen items-center justify-center bg-white text-gray-400">ロード中...</div>}>
       <LoginForm />
     </Suspense>
   );

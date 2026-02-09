@@ -18,5 +18,5 @@ export default function Home() {
     }
   }, [isAuthenticated, isLoading, router]);
 
-  return <div className="flex h-screen items-center justify-center bg-white text-gray-400">Loading...</div>;
+  return <div className="flex h-screen items-center justify-center bg-white text-gray-400">ロード中...</div>;
 }

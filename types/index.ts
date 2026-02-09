@@ -59,7 +59,7 @@ export interface TestItem {
   };
   repairCount?: number;
   criterion: string;
-  autoScore: string;
+  score_auto: string;
   mocaJ: string;
   time: string;
   btn?: string;
