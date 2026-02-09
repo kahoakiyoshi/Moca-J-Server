@@ -74,13 +74,14 @@ export async function PATCH(
 
   try {
     const body = await request.json();
-    const { approved, score } = body;
+    const { approved, score, result } = body;
 
     const updateData: any = {
       updated_at: new Date().toISOString()
     };
     if (approved !== undefined) updateData.approved = approved;
     if (score !== undefined) updateData.score = score;
+    if (result !== undefined) updateData.result = result;
 
     await adminDb.collection('test_results').doc(id).update(updateData);
 

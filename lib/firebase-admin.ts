@@ -16,6 +16,7 @@ if (!admin.apps.length) {
       admin.initializeApp({
         credential: admin.credential.cert(firebaseAdminConfig),
         databaseURL: `https://${firebaseAdminConfig.projectId}.firebaseio.com`,
+        storageBucket: process.env.FIREBASE_STORAGE_BUCKET || process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
       });
     } catch (error) {
       console.error('Firebase admin initialization error:', error);
@@ -25,4 +26,5 @@ if (!admin.apps.length) {
 
 export const adminDb = admin.apps.length ? admin.firestore() : null!;
 export const adminAuth = admin.apps.length ? admin.auth() : null!;
+export const adminStorage = admin.apps.length ? admin.storage() : null!;
 export default admin;

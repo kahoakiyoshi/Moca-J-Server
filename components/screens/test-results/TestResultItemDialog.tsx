@@ -38,8 +38,6 @@ export const TestResultItemDialog: React.FC<TestResultItemDialogProps> = ({
   onUpdate,
 }) => {
 
-  console.log(item)
-
   const renderValue = (val: any) => {
     return typeof val === 'object' ? JSON.stringify(val) : val;
   }
@@ -214,14 +212,14 @@ export const TestResultItemDialog: React.FC<TestResultItemDialogProps> = ({
                 });
               }}
             >
-              <SelectTrigger className="w-full h-12 bg-neutral-50 border-neutral-200 rounded-xl font-bold">
+              <SelectTrigger className="w-full h-12 bg-neutral-50 border-neutral-200">
                 <SelectValue placeholder="判定を選択" />
               </SelectTrigger>
-              <SelectContent className="rounded-xl border-neutral-200 shadow-xl">
-                <SelectItem value="true" className="focus:bg-emerald-50 focus:text-emerald-700 py-3 font-bold cursor-pointer">
+              <SelectContent className="border-neutral-200 shadow-xl">
+                <SelectItem value="true">
                   OK
                 </SelectItem>
-                <SelectItem value="false" className="focus:bg-red-50 focus:text-red-700 py-3 font-bold cursor-pointer">
+                <SelectItem value="false">
                   NG
                 </SelectItem>
               </SelectContent>
@@ -229,7 +227,7 @@ export const TestResultItemDialog: React.FC<TestResultItemDialogProps> = ({
           </div>
         </div>
         <DialogFooter className="p-6 bg-neutral-50 border-t border-neutral-100">
-          <Button onClick={() => onOpenChange(false)} className="w-full hover:bg-black text-white px-8 h-11 font-bold rounded-xl shadow-lg transition-all active:scale-95">
+          <Button onClick={() => onOpenChange(false)} className="w-full hover:bg-black text-white px-8 h-11 font-bold shadow-lg transition-all active:scale-95">
             閉じる
           </Button>
         </DialogFooter>
