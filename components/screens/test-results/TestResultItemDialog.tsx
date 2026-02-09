@@ -232,7 +232,12 @@ export const TestResultItemDialog: React.FC<TestResultItemDialogProps> = ({
                 if (item.isCorrect === isCorrect) return;
 
                 const currentScore = Number(item.score) || 0;
-                const newScore = isCorrect ? currentScore + (item?.taskKey === 'orientation_task' ? 0.75 : 1) : Math.max(0, currentScore - (item?.taskKey === 'orientation_task' ? 0.75 : 1));
+                let newScore = currentScore;
+                if(item?.taskKey === 'drawing_test') {
+                  newScore = 0;
+                } else {
+                  newScore = isCorrect ? currentScore + (item?.taskKey === 'orientation_task' ? 0.75 : 1) : Math.max(0, currentScore - (item?.taskKey === 'orientation_task' ? 0.75 : 1));
+                }
 
                 onUpdate({
                   ...item,
