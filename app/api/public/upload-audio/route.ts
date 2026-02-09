@@ -2,17 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 import { writeFile, mkdir } from 'fs/promises';
 import { adminStorage } from '@/lib/firebase-admin';
+import { put } from '@vercel/blob';
 
 /**
  * CONFIGURATION: CHANGE THIS TO SWITCH BETWEEN UPLOAD MODES
- * 'local' -> Save to public/uploads/audios on the server
- * 'firebase' -> Save to Firebase Storage
+ * 'local'        -> Save to public/uploads/audios on the server (Local development only)
+ * 'firebase'     -> Save to Firebase Storage (Requires Firebase setup)
+ * 'vercel-blob'  -> Save to Vercel Blob (Requires BLOB_READ_WRITE_TOKEN env var on Vercel)
  */
-const UPLOAD_MODE: 'local' | 'firebase' = 'local'; 
+const UPLOAD_MODE: 'local' | 'firebase' | 'vercel-blob' = 'vercel-blob'; 
 
 /**
  * POST /api/public/upload-audio
- * Public API to upload audio files. Supports both Local and Firebase Storage.
+ * Public API to upload audio files. Supports Local, Firebase, and Vercel Blob.
  */
 export async function POST(request: NextRequest) {
   try {
@@ -26,7 +28,21 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(await file.arrayBuffer());
     const fileName = `${crypto.randomUUID()}_${file.name}`;
 
-    if (UPLOAD_MODE === 'firebase') {
+    if (UPLOAD_MODE === 'vercel-blob') {
+      // --- MODE 3: VERCEL BLOB ---
+      const blob = await put(`audios/${fileName}`, buffer, {
+        access: 'public',
+        contentType: file.type || 'audio/m4a',
+      });
+      
+      return createResponse({ 
+        success: true, 
+        url: blob.url, 
+        path: blob.url, 
+        mode: 'vercel-blob' 
+      });
+
+    } else if (UPLOAD_MODE === 'firebase') {
       // --- MODE 1: FIREBASE STORAGE ---
       const bucket = adminStorage.bucket();
       const storageFile = bucket.file(`audios/${fileName}`);
@@ -37,11 +53,16 @@ export async function POST(request: NextRequest) {
 
       const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(`audios/${fileName}`)}?alt=media`;
       
-      return createResponse({ success: true, url: publicUrl, path: `audios/${fileName}`, mode: 'firebase' });
+      return createResponse({ 
+        success: true, 
+        url: publicUrl, 
+        path: `audios/${fileName}`, 
+        mode: 'firebase' 
+      });
 
     } else {
       // --- MODE 2: LOCAL FILESYSTEM ---
-      const uploadDir = path.join(process.cwd(), 'public/uploads/audios');
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'audios');
       const filePath = path.join(uploadDir, fileName);
 
       try {
@@ -53,7 +74,12 @@ export async function POST(request: NextRequest) {
       await writeFile(filePath, buffer);
       const relativePath = `/uploads/audios/${fileName}`;
 
-      return createResponse({ success: true, url: relativePath, path: relativePath, mode: 'local' });
+      return createResponse({ 
+        success: true, 
+        url: relativePath, 
+        path: relativePath, 
+        mode: 'local' 
+      });
     }
 
   } catch (error: any) {
