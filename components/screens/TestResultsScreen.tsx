@@ -34,6 +34,8 @@ interface TestResultsFilters {
 }
 
 import { TestResultsSearchForm } from './test-results/TestResultsSearchForm';
+import Duration from './test-results/Duration';
+import { TestResult } from '@/types';
 
 const TestResultsScreen: React.FC<TestResultsScreenProps> = ({ onNavigate }) => {
   const router = useRouter();
@@ -68,6 +70,8 @@ const TestResultsScreen: React.FC<TestResultsScreenProps> = ({ onNavigate }) => 
   const handleClear = () => {
     router.push(pathname);
   };
+
+
 
   return (
     <div className="flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -107,7 +111,7 @@ const TestResultsScreen: React.FC<TestResultsScreenProps> = ({ onNavigate }) => 
                 <TableCell colSpan={6} className="h-32 text-center text-neutral-400">データがありません</TableCell>
               </TableRow>
             ) : (
-              results.map((item) => (
+              results.map((item: TestResult) => (
                 <TableRow key={item.uid} className="hover:bg-neutral-50/50 transition-colors">
                   <TableCell className="py-4 font-mono text-[13px] text-neutral-500">{item.patientId}</TableCell>
                   <TableCell className="py-4 text-neutral-600">
@@ -116,7 +120,7 @@ const TestResultsScreen: React.FC<TestResultsScreenProps> = ({ onNavigate }) => 
                   <TableCell className="py-4 text-right pr-6 font-bold text-neutral-800">
                     {typeof item.score === 'number' ? item.score.toFixed(2) : item.score}
                   </TableCell>
-                  <TableCell className="py-4 text-neutral-600">{item.duration}</TableCell>
+                  <TableCell className="py-4 text-neutral-600"><Duration items={item?.result || []} /></TableCell>
                   <TableCell className="py-4">
                     <Badge variant={item.approved ? 'outline' : 'outline'} className={item.approved ? 'bg-emerald-50 text-emerald-700 border-emerald-200 font-medium' : 'bg-neutral-50 text-neutral-500 font-medium'}>
                       {item.approved ? '承認済' : '未承認'}

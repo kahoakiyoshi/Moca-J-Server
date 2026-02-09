@@ -50,22 +50,51 @@ export const TestResultItemDialog: React.FC<TestResultItemDialogProps> = ({
           return "入力: " + val.ids?.join('→');
         }
         return "入力: " + (typeof val === 'object' ? JSON.stringify(val) : val);
-      case 'drawing_test':
+      case 'drawing_test': {
         const paths = val as any;
         if (!Array.isArray(paths)) return '';
-        return <svg className='text-[300px] w-[300px] h-[300px]' viewBox="0 0 300 300">
-          {paths.map((path: any, index: number) => (
-            <path
-              key={index}
-              d={path.path}
-              stroke={path.color}
-              strokeWidth={2}
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          ))}
-        </svg>
+
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+
+        paths.forEach(p => {
+          const points = p.path.match(/-?\d+(\.\d+)?/g)?.map(Number) || [];
+          for (let i = 0; i < points.length; i += 2) {
+            const x = points[i];
+            const y = points[i + 1];
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+          }
+        });
+
+        const width = maxX - minX;
+        const height = maxY - minY;
+
+        const viewBox = `${minX} ${minY} ${width} ${height}`;
+
+        return (
+          <div className="flex items-center justify-center w-full">
+            <svg
+              className="w-[200px] h-[200px]"
+              viewBox={viewBox}
+              preserveAspectRatio="xMidYMid meet"
+            >
+              {paths.map((path, idx) => (
+                <path
+                  key={idx}
+                  d={path.path}
+                  stroke={path.color}
+                  strokeWidth={2}
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              ))}
+            </svg>
+          </div>
+        );
+      }
       case 'shape_recall':
         return val ? <img src={SHAPE_RECALL_IMAGE[val as keyof typeof SHAPE_RECALL_IMAGE]} className='w-[100px] h-[100px]' alt="" /> : ''
       case 'shape_match':
@@ -165,7 +194,7 @@ export const TestResultItemDialog: React.FC<TestResultItemDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md p-0 border-0 shadow-2xl overflow-hidden rounded-2xl">
+      <DialogContent className="max-w-md p-0 border-0 shadow-2xl overflow-hidden rounded-2xl max-h-[calc(100vh-2rem)] overflow-y-auto">
         <DialogHeader className="p-6 bg-neutral-50 border-b border-neutral-100">
           <DialogTitle className="text-lg font-bold tracking-tight flex items-center gap-2">
             <Info className="text-[#3f65b8] h-5 w-5" />
@@ -185,8 +214,6 @@ export const TestResultItemDialog: React.FC<TestResultItemDialogProps> = ({
               {renderReference(item)}
             </div>
           </div>
-
-          <Separator className="bg-neutral-100 mb-5" />
 
           <div className="space-y-4 pb-4">
             <div className="flex items-center justify-between">
