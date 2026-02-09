@@ -89,10 +89,10 @@ export const TestResultItemDialog: React.FC<TestResultItemDialogProps> = ({
         return renderValue(val)
       case 'delayed_recall':
         return item?.questionKey === 'free_recall' ? renderValue(val) : "入力: " + item?.answer
-      case 'sentence_task':
-        return item?.answer;
       case 'letter_tap_task':
         return item?.tapSummary;
+      case 'sentence_task':
+        return item?.value ? <audio controls src={item?.value as any} /> : '';
       case 'naming_task':
         return "入力: " + (typeof val === 'object' ? JSON.stringify(val) : val);
       case 'fluency_task':
@@ -116,6 +116,8 @@ export const TestResultItemDialog: React.FC<TestResultItemDialogProps> = ({
       case 'shape_recall':
         return '';
       case 'shape_match':
+        return '';
+      case 'sentence_task':
         return '';
       case 'simple_shape_selection':
         return '';
@@ -203,7 +205,7 @@ export const TestResultItemDialog: React.FC<TestResultItemDialogProps> = ({
                 if (item.isCorrect === isCorrect) return;
 
                 const currentScore = Number(item.score) || 0;
-                const newScore = isCorrect ? currentScore + 1 : Math.max(0, currentScore - 1);
+                const newScore = isCorrect ? currentScore + (item?.taskKey === 'orientation_task' ? 0.75 : 1) : Math.max(0, currentScore - (item?.taskKey === 'orientation_task' ? 0.75 : 1));
 
                 onUpdate({
                   ...item,
