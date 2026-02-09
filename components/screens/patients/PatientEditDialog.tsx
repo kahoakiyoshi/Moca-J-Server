@@ -233,7 +233,7 @@ export const PatientEditDialog: React.FC<PatientEditDialogProps> = ({
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>都道府県</Label>
+                  <Label>都道府県 <span className="text-red-500">*</span></Label>
                   <Controller
                     name="prefecture"
                     control={control}
