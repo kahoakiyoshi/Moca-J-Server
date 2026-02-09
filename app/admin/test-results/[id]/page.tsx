@@ -8,10 +8,5 @@ export default function TestResultDetailPage() {
   const params = useParams();
   const id = params.id as string;
 
-  return (
-    <TestResultDetailScreen 
-      id={id} 
-      onBack={() => router.push('/admin/test-results')} 
-    />
-  );
+  return <TestResultDetailScreen id={id} onBack={() => router.push("/admin/test-results")} />;
 }

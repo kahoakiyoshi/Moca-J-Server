@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -16,12 +16,12 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@/components/ui/select";
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { adminUserSchema } from '@/schemas';
-import { User } from '@/types';
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { adminUserSchema } from "@/schemas";
+import { User } from "@/types";
 
 interface UserEditDialogProps {
   open: boolean;
@@ -41,17 +41,17 @@ export const UserEditDialog: React.FC<UserEditDialogProps> = ({
     handleSubmit,
     control,
     reset,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting },
   } = useForm<User>({
     resolver: yupResolver(adminUserSchema) as any,
     defaultValues: {
-      uid: '',
-      id: '',
-      lastName: '',
-      firstName: '',
-      email: '',
-      role: 'user'
-    }
+      uid: "",
+      id: "",
+      lastName: "",
+      firstName: "",
+      email: "",
+      role: "user",
+    },
   });
 
   useEffect(() => {
@@ -64,27 +64,29 @@ export const UserEditDialog: React.FC<UserEditDialogProps> = ({
     await onSubmit(data);
   };
 
-  const editingId = user?.uid && user.uid !== 'new' ? user.uid : null;
+  const editingId = user?.uid && user.uid !== "new" ? user.uid : null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md p-0 border-0 shadow-2xl overflow-hidden">
-        <DialogHeader className="p-6 bg-neutral-50 border-b border-neutral-100">
+      <DialogContent className="max-w-md overflow-hidden border-0 p-0 shadow-2xl">
+        <DialogHeader className="border-b border-neutral-100 bg-neutral-50 p-6">
           <DialogTitle className="text-xl font-medium tracking-tight">
             {editingId ? "病院ユーザーの編集" : "新規ユーザー登録"}
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(handleFormSubmit)}>
-          <div className="px-8 space-y-6 text-[13px]">
+          <div className="space-y-6 px-8 text-[13px]">
             {editingId ? (
               <div className="space-y-2">
-                <Label htmlFor="id" className="text-xs font-semibold text-neutral-400 uppercase">病院ユーザーID</Label>
-                <div className="text-sm font-mono text-neutral-400 bg-neutral-50 p-2 rounded border border-dashed truncate">
+                <Label htmlFor="id" className="text-xs font-semibold text-neutral-400 uppercase">
+                  病院ユーザーID
+                </Label>
+                <div className="truncate rounded border border-dashed bg-neutral-50 p-2 font-mono text-sm text-neutral-400">
                   {editingId}
                 </div>
               </div>
             ) : (
-              <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg text-blue-700 text-base font-medium mb-2">
+              <div className="mb-2 rounded-lg border border-blue-100 bg-blue-50 p-3 text-base font-medium text-blue-700">
                 新規ユーザーの初期パスワードは <strong>password1234</strong> です。
               </div>
             )}
@@ -93,21 +95,25 @@ export const UserEditDialog: React.FC<UserEditDialogProps> = ({
                 <Label htmlFor="lastName">姓</Label>
                 <Input
                   id="lastName"
-                  {...register('lastName')}
+                  {...register("lastName")}
                   disabled={isSubmitting}
                   className={errors.lastName ? "border-red-500" : ""}
                 />
-                {errors.lastName && <p className="text-[10px] text-red-500 font-medium">{errors.lastName.message}</p>}
+                {errors.lastName && (
+                  <p className="text-[10px] font-medium text-red-500">{errors.lastName.message}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="firstName">名</Label>
                 <Input
                   id="firstName"
-                  {...register('firstName')}
+                  {...register("firstName")}
                   disabled={isSubmitting}
                   className={errors.firstName ? "border-red-500" : ""}
                 />
-                {errors.firstName && <p className="text-[10px] text-red-500 font-medium">{errors.firstName.message}</p>}
+                {errors.firstName && (
+                  <p className="text-[10px] font-medium text-red-500">{errors.firstName.message}</p>
+                )}
               </div>
             </div>
             <div className="space-y-2">
@@ -115,11 +121,13 @@ export const UserEditDialog: React.FC<UserEditDialogProps> = ({
               <Input
                 id="email"
                 type="email"
-                {...register('email')}
+                {...register("email")}
                 disabled={isSubmitting}
                 className={errors.email ? "border-red-500" : ""}
               />
-              {errors.email && <p className="text-[10px] text-red-500 font-medium">{errors.email.message}</p>}
+              {errors.email && (
+                <p className="text-[10px] font-medium text-red-500">{errors.email.message}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label>権限</Label>
@@ -127,7 +135,11 @@ export const UserEditDialog: React.FC<UserEditDialogProps> = ({
                 name="role"
                 control={control}
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange} disabled={isSubmitting}>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={isSubmitting}
+                  >
                     <SelectTrigger className="bg-white font-medium text-neutral-700">
                       <SelectValue />
                     </SelectTrigger>
@@ -140,12 +152,21 @@ export const UserEditDialog: React.FC<UserEditDialogProps> = ({
               />
             </div>
           </div>
-          <DialogFooter className="p-6 bg-neutral-50 border-t border-neutral-100 gap-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
+          <DialogFooter className="gap-2 border-t border-neutral-100 bg-neutral-50 p-6">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isSubmitting}
+            >
               キャンセル
             </Button>
-            <Button type="submit" disabled={isSubmitting} className="bg-[#3f65b8] hover:bg-[#345399] px-8">
-              {isSubmitting ? "保存中..." : (editingId ? "保存する" : "登録する")}
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-[#3f65b8] px-8 hover:bg-[#345399]"
+            >
+              {isSubmitting ? "保存中..." : editingId ? "保存する" : "登録する"}
             </Button>
           </DialogFooter>
         </form>

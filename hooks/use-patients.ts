@@ -1,6 +1,6 @@
-import { useFetch } from './use-fetch';
-import { patientService } from '@/services';
-import { Patient } from '@/types';
+import { useFetch } from "./use-fetch";
+import { patientService } from "@/services";
+import { Patient } from "@/types";
 
 interface UsePatientsProps {
   id?: string;
@@ -9,12 +9,10 @@ interface UsePatientsProps {
 }
 
 export const usePatients = (props?: UsePatientsProps) => {
-  const { 
-    data, 
-    isLoading, 
-    error, 
-    execute 
-  } = useFetch<{ patients: Patient[]; totalCount: number }, { id?: string; searchName?: string }>({
+  const { data, isLoading, error, execute } = useFetch<
+    { patients: Patient[]; totalCount: number },
+    { id?: string; searchName?: string }
+  >({
     fetchFn: (params) => patientService.getPatients(params),
     initialParams: { id: props?.id, searchName: props?.searchName },
     autoFetch: props?.autoFetch !== false,

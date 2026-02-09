@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 interface UseFetchOptions<T, P> {
   fetchFn: (params?: P) => Promise<T>;
@@ -29,7 +29,7 @@ export const useFetch = <T, P = any>({
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     if (autoFetch) {

@@ -9,11 +9,11 @@ function LoginForm() {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || "/admin/patients";
+  const callbackUrl = searchParams.get("callbackUrl") || "/admin/patients";
 
   useEffect(() => {
-    const errorParam = searchParams.get('error');
-    if (!isLoading && isAuthenticated && errorParam !== 'unauthorized') {
+    const errorParam = searchParams.get("error");
+    if (!isLoading && isAuthenticated && errorParam !== "unauthorized") {
       router.push(callbackUrl);
     }
   }, [isAuthenticated, isLoading, router, callbackUrl, searchParams]);
@@ -30,7 +30,13 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="flex h-screen items-center justify-center bg-white text-gray-400">ロード中...</div>}>
+    <Suspense
+      fallback={
+        <div className="flex h-screen items-center justify-center bg-white text-gray-400">
+          ロード中...
+        </div>
+      }
+    >
       <LoginForm />
     </Suspense>
   );

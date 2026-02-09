@@ -4,15 +4,13 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: ".",
   },
-  allowedDevOrigins: [
-    "*"
-  ],
+  allowedDevOrigins: ["*"],
   async rewrites() {
     return {
       beforeFiles: [
         {
-          source: '/public/upload-audio',
-          destination: '/api/public/upload-audio',
+          source: "/public/upload-audio",
+          destination: "/api/public/upload-audio",
         },
       ],
     };

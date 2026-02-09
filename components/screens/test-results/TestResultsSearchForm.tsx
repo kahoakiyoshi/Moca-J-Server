@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect } from 'react';
-import { Search, X } from 'lucide-react';
+import React, { useEffect } from "react";
+import { Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,9 +11,9 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@/components/ui/select";
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller } from "react-hook-form";
 
 interface TestResultsFilters {
   patientId: string;
@@ -34,39 +34,38 @@ export const TestResultsSearchForm: React.FC<TestResultsSearchFormProps> = ({
   onClear,
 }) => {
   const { register, handleSubmit, control, setValue } = useForm<TestResultsFilters>({
-    defaultValues: initialFilters
+    defaultValues: initialFilters,
   });
 
   useEffect(() => {
-    setValue('patientId', initialFilters.patientId);
-    setValue('approval', initialFilters.approval);
-    setValue('startDate', initialFilters.startDate);
-    setValue('endDate', initialFilters.endDate);
+    setValue("patientId", initialFilters.patientId);
+    setValue("approval", initialFilters.approval);
+    setValue("startDate", initialFilters.startDate);
+    setValue("endDate", initialFilters.endDate);
   }, [initialFilters, setValue]);
 
   return (
     <form onSubmit={handleSubmit(onSearch)}>
-      <Card className="mb-8 border-neutral-100 shadow-sm bg-neutral-50/50">
+      <Card className="mb-8 border-neutral-100 bg-neutral-50/50 shadow-sm">
         <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
+          <div className="grid grid-cols-1 items-end gap-6 md:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
               <Label className="text-xs font-semibold text-neutral-500 uppercase">患者ID</Label>
               <Input
                 placeholder="患者IDで検索..."
-                {...register('patientId')}
+                {...register("patientId")}
                 className="bg-white"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs font-semibold text-neutral-500 uppercase">承認ステータス</Label>
+              <Label className="text-xs font-semibold text-neutral-500 uppercase">
+                承認ステータス
+              </Label>
               <Controller
                 name="approval"
                 control={control}
                 render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                  >
+                  <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger className="bg-white">
                       <SelectValue />
                     </SelectTrigger>
@@ -81,26 +80,23 @@ export const TestResultsSearchForm: React.FC<TestResultsSearchFormProps> = ({
             </div>
             <div className="space-y-2">
               <Label className="text-xs font-semibold text-neutral-500 uppercase">開始日</Label>
-              <Input
-                type="date"
-                {...register('startDate')}
-                className="bg-white px-3"
-              />
+              <Input type="date" {...register("startDate")} className="bg-white px-3" />
             </div>
             <div className="space-y-2">
               <Label className="text-xs font-semibold text-neutral-500 uppercase">終了日</Label>
-              <Input
-                type="date"
-                {...register('endDate')}
-                className="bg-white px-3"
-              />
+              <Input type="date" {...register("endDate")} className="bg-white px-3" />
             </div>
           </div>
-          <div className="flex justify-end gap-3 mt-6">
-            <Button type="button" variant="outline" onClick={onClear} className="h-9 px-4 text-neutral-600">
+          <div className="mt-6 flex justify-end gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClear}
+              className="h-9 px-4 text-neutral-600"
+            >
               <X className="mr-2 h-3 w-3" /> クリア
             </Button>
-            <Button type="submit" className="bg-[#3f65b8] hover:bg-[#345399] h-9 px-6 shadow-sm">
+            <Button type="submit" className="h-9 bg-[#3f65b8] px-6 shadow-sm hover:bg-[#345399]">
               <Search className="mr-2 h-3.5 w-3.5" /> 絞り込む
             </Button>
           </div>

@@ -1,6 +1,6 @@
-import { useFetch } from './use-fetch';
-import { testResultService } from '@/services';
-import { TestResult } from '@/types';
+import { useFetch } from "./use-fetch";
+import { testResultService } from "@/services";
+import { TestResult } from "@/types";
 
 interface UseTestResultsProps {
   patientId?: string;
@@ -11,23 +11,21 @@ interface UseTestResultsProps {
 }
 
 export const useTestResults = (props?: UseTestResultsProps) => {
-  const { 
-    data, 
-    isLoading, 
-    error, 
-    execute 
-  } = useFetch<TestResult[], { 
-    patientId?: string;
-    approved?: string;
-    startDate?: string;
-    endDate?: string;
-  }>({
+  const { data, isLoading, error, execute } = useFetch<
+    TestResult[],
+    {
+      patientId?: string;
+      approved?: string;
+      startDate?: string;
+      endDate?: string;
+    }
+  >({
     fetchFn: (params) => testResultService.getTestResults(params),
-    initialParams: { 
+    initialParams: {
       patientId: props?.patientId,
       approved: props?.approved,
       startDate: props?.startDate,
-      endDate: props?.endDate
+      endDate: props?.endDate,
     },
     autoFetch: props?.autoFetch !== false,
   });

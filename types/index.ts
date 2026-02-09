@@ -1,8 +1,8 @@
-export type UserRole = 'admin' | 'user';
+export type UserRole = "admin" | "user";
 
 export interface User {
   uid: string; // Firebase Auth UID
-  id: string;  // Sequential ID (e.g. 000001)
+  id: string; // Sequential ID (e.g. 000001)
   lastName: string;
   firstName: string;
   email: string;
@@ -53,10 +53,12 @@ export interface TestItem {
   name: string;
   result: string;
   score: string | number;
-  value: string | {
-    ids: string[];
-    repairCount: number;
-  };
+  value:
+    | string
+    | {
+        ids: string[];
+        repairCount: number;
+      };
   repairCount?: number;
   criterion: string;
   score_auto: string;
@@ -64,10 +66,13 @@ export interface TestItem {
   time: string;
   btn?: string;
   taskKey?: string;
-  answer: string | {
-    ids: string[];
-    repairCount: number;
-  } | any;
+  answer:
+    | string
+    | {
+        ids: string[];
+        repairCount: number;
+      }
+    | any;
   judgmentCriteria: string;
   questionKey: string;
   gpsDetail?: string;

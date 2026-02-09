@@ -1,11 +1,11 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import Cookies from 'js-cookie';
-import { auth } from '@/lib/firebase';
-import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
-import { User } from '@/types';
-import { ROLES } from '@/lib/constants';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import Cookies from "js-cookie";
+import { auth } from "@/lib/firebase";
+import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
+import { User } from "@/types";
+import { ROLES } from "@/lib/constants";
 
 /**
  * Interface for authentication context
@@ -31,45 +31,45 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // Listen for Firebase Auth state changes
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
-      console.log('Firebase Auth State Changed:', firebaseUser?.email || 'No User');
+      console.log("Firebase Auth State Changed:", firebaseUser?.email || "No User");
       if (firebaseUser) {
         // Fetch additional user data from our API helper (uses Admin SDK to bypass permissions)
         try {
           // Get ID token first to authenticate the API request
           const idToken = await firebaseUser.getIdToken();
-          Cookies.set('id_token', idToken, { expires: 1 });
+          Cookies.set("id_token", idToken, { expires: 1 });
 
-          const response = await fetch('/api/auth/me');
+          const response = await fetch("/api/auth/me");
           if (!response.ok) {
-             throw new Error('Failed to fetch user profile from API');
+            throw new Error("Failed to fetch user profile from API");
           }
-          
+
           const { user: userData } = await response.json();
-          
+
           setUser(userData);
-          localStorage.setItem('admin_user', JSON.stringify(userData));
-          Cookies.set('is_authenticated', 'true', { expires: 1 });
-          Cookies.set('user_role', userData.role, { expires: 1 });
+          localStorage.setItem("admin_user", JSON.stringify(userData));
+          Cookies.set("is_authenticated", "true", { expires: 1 });
+          Cookies.set("user_role", userData.role, { expires: 1 });
         } catch (error) {
           console.error("Error fetching user data:", error);
           // Fallback basic user object if API fails
           const fallbackUser: User = {
             uid: firebaseUser.uid,
-            id: '',
-            email: firebaseUser.email || '',
-            lastName: '',
-            firstName: '',
+            id: "",
+            email: firebaseUser.email || "",
+            lastName: "",
+            firstName: "",
             role: ROLES.USER,
-            name: firebaseUser.displayName || 'User'
+            name: firebaseUser.displayName || "User",
           };
           setUser(fallbackUser);
         }
       } else {
         setUser(null);
-        localStorage.removeItem('admin_user');
-        Cookies.remove('is_authenticated');
-        Cookies.remove('id_token');
-        Cookies.remove('user_role');
+        localStorage.removeItem("admin_user");
+        Cookies.remove("is_authenticated");
+        Cookies.remove("id_token");
+        Cookies.remove("user_role");
       }
       setIsLoading(false);
     });
@@ -79,24 +79,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = (userData: User) => {
     setUser(userData);
-    localStorage.setItem('admin_user', JSON.stringify(userData));
-    Cookies.set('is_authenticated', 'true', { expires: 1 });
+    localStorage.setItem("admin_user", JSON.stringify(userData));
+    Cookies.set("is_authenticated", "true", { expires: 1 });
   };
 
   const logout = async () => {
     await auth.signOut();
     setUser(null);
-    localStorage.removeItem('admin_user');
-    Cookies.remove('is_authenticated');
-    Cookies.remove('id_token');
-    Cookies.remove('user_role');
+    localStorage.removeItem("admin_user");
+    Cookies.remove("is_authenticated");
+    Cookies.remove("id_token");
+    Cookies.remove("user_role");
   };
 
   const updateUser = (userData: Partial<User>) => {
     if (user) {
       const updatedUser = { ...user, ...userData };
       setUser(updatedUser);
-      localStorage.setItem('admin_user', JSON.stringify(updatedUser));
+      localStorage.setItem("admin_user", JSON.stringify(updatedUser));
     }
   };
 
@@ -122,7 +122,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

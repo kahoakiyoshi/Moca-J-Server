@@ -1,7 +1,7 @@
 "use client";
 
-import React from 'react';
-import { Info, Check, X } from 'lucide-react';
+import React from "react";
+import { Info, Check, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -19,10 +19,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { alls_test } from '@/lib/constants';
-import { TestItem } from '@/types';
-import { SHAPE_MATCHING_IMAGE, SHAPE_RECALL_IMAGE } from './Constant';
-import { renderShape } from './Shap';
+import { alls_test } from "@/lib/constants";
+import { TestItem } from "@/types";
+import { SHAPE_MATCHING_IMAGE, SHAPE_RECALL_IMAGE } from "./Constant";
+import { renderShape } from "./Shap";
 
 interface TestResultItemDialogProps {
   open: boolean;
@@ -37,26 +37,28 @@ export const TestResultItemDialog: React.FC<TestResultItemDialogProps> = ({
   item,
   onUpdate,
 }) => {
-
   const renderValue = (val: any) => {
-    return typeof val === 'object' ? JSON.stringify(val) : val;
-  }
+    return typeof val === "object" ? JSON.stringify(val) : val;
+  };
   const renderTest = (item: TestItem | null) => {
-    if (!item) return 'データが存在しません';
+    if (!item) return "データが存在しません";
     const val = item.value;
     switch (item.taskKey) {
-      case 'node_test':
-        if (typeof val === 'object' && 'ids' in val) {
-          return "入力: " + val.ids?.join('→');
+      case "node_test":
+        if (typeof val === "object" && "ids" in val) {
+          return "入力: " + val.ids?.join("→");
         }
-        return "入力: " + (typeof val === 'object' ? JSON.stringify(val) : val);
-      case 'drawing_test': {
+        return "入力: " + (typeof val === "object" ? JSON.stringify(val) : val);
+      case "drawing_test": {
         const paths = val as any;
-        if (!Array.isArray(paths)) return '';
+        if (!Array.isArray(paths)) return "";
 
-        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        let minX = Infinity,
+          minY = Infinity,
+          maxX = -Infinity,
+          maxY = -Infinity;
 
-        paths.forEach(p => {
+        paths.forEach((p) => {
           const points = p.path.match(/-?\d+(\.\d+)?/g)?.map(Number) || [];
           for (let i = 0; i < points.length; i += 2) {
             const x = points[i];
@@ -74,9 +76,9 @@ export const TestResultItemDialog: React.FC<TestResultItemDialogProps> = ({
         const viewBox = `${minX} ${minY} ${width} ${height}`;
 
         return (
-          <div className="flex items-center justify-center w-full">
+          <div className="flex w-full items-center justify-center">
             <svg
-              className="w-[200px] h-[200px]"
+              className="h-[200px] w-[200px]"
               viewBox={viewBox}
               preserveAspectRatio="xMidYMid meet"
             >
@@ -95,131 +97,158 @@ export const TestResultItemDialog: React.FC<TestResultItemDialogProps> = ({
           </div>
         );
       }
-      case 'shape_recall':
-        return val ? <img src={SHAPE_RECALL_IMAGE[val as keyof typeof SHAPE_RECALL_IMAGE]} className='w-[100px] h-[100px]' alt="" /> : ''
-      case 'shape_match':
-        return val ? <img src={SHAPE_MATCHING_IMAGE[val as keyof typeof SHAPE_MATCHING_IMAGE]} className='w-[100px] h-[100px]' alt="" /> : ''
-      case 'simple_shape_selection':
-        if (!val) return '';
+      case "shape_recall":
+        return val ? (
+          <img
+            src={SHAPE_RECALL_IMAGE[val as keyof typeof SHAPE_RECALL_IMAGE]}
+            className="h-[100px] w-[100px]"
+            alt=""
+          />
+        ) : (
+          ""
+        );
+      case "shape_match":
+        return val ? (
+          <img
+            src={SHAPE_MATCHING_IMAGE[val as keyof typeof SHAPE_MATCHING_IMAGE]}
+            className="h-[100px] w-[100px]"
+            alt=""
+          />
+        ) : (
+          ""
+        );
+      case "simple_shape_selection":
+        if (!val) return "";
         try {
           const shapeType = val as string;
           return renderShape(shapeType);
         } catch (e) {
-          return renderValue(val)
+          return renderValue(val);
         }
-      case 'clock_validation':
-        return renderValue(val)
-      case 'word_recall':
-        return Array.isArray(item?.answer) ? "入力: " + item?.answer.join(',') : renderValue(val)
-      case 'sequence_recall':
-        const sequence_recall = (typeof val === 'string' ? val : JSON.stringify(val)) ?? "";
-        return "入力: " + sequence_recall?.split("")?.join('→');
-      case 'subtraction_task':
-        return renderValue(val)
-      case 'delayed_recall':
-        return item?.questionKey === 'free_recall' ? renderValue(val) : "入力: " + item?.answer
-      case 'letter_tap_task':
+      case "clock_validation":
+        return renderValue(val);
+      case "word_recall":
+        return Array.isArray(item?.answer) ? "入力: " + item?.answer.join(",") : renderValue(val);
+      case "sequence_recall":
+        const sequence_recall = (typeof val === "string" ? val : JSON.stringify(val)) ?? "";
+        return "入力: " + sequence_recall?.split("")?.join("→");
+      case "subtraction_task":
+        return renderValue(val);
+      case "delayed_recall":
+        return item?.questionKey === "free_recall" ? renderValue(val) : "入力: " + item?.answer;
+      case "letter_tap_task":
         return item?.tapSummary;
-      case 'sentence_task':
-        return item?.value ? <audio controls src={item?.value as any} /> : '';
-      case 'naming_task':
-        return "入力: " + (typeof val === 'object' ? JSON.stringify(val) : val);
-      case 'fluency_task':
-        return Array.isArray(val) ? "入力: " + val.join(',') : renderValue(val)
-      case 'similarity_task':
-        return "入力: " + (typeof val === 'object' ? JSON.stringify(val) : val);
-      case 'orientation_task':
-        return "入力: " + (typeof val === 'object' ? JSON.stringify(val) : val);
+      case "sentence_task":
+        return item?.value ? <audio controls src={item?.value as any} /> : "";
+      case "naming_task":
+        return "入力: " + (typeof val === "object" ? JSON.stringify(val) : val);
+      case "fluency_task":
+        return Array.isArray(val) ? "入力: " + val.join(",") : renderValue(val);
+      case "similarity_task":
+        return "入力: " + (typeof val === "object" ? JSON.stringify(val) : val);
+      case "orientation_task":
+        return "入力: " + (typeof val === "object" ? JSON.stringify(val) : val);
       default:
-        return typeof val === 'object' ? JSON.stringify(val) : (val || 'データが存在しません');
+        return typeof val === "object" ? JSON.stringify(val) : val || "データが存在しません";
     }
-  }
+  };
 
   const renderReference = (item: TestItem | null) => {
-    if (!item) return 'データが存在しません';
+    if (!item) return "データが存在しません";
     switch (item.taskKey) {
-      case 'clock_validation':
-        return '';
-      case 'subtraction_task':
-        return '';
-      case 'shape_recall':
-        return '';
-      case 'shape_match':
-        return '';
-      case 'sentence_task':
-        return '';
-      case 'simple_shape_selection':
-        return '';
-      case 'naming_task':
-        return '';
-      case 'word_recall':
-        return '';
-      case 'sequence_recall':
-        return '';
-      case 'sentence_task':
-        return '';
-      case 'similarity_task':
-        return '';
-      case 'delayed_recall':
-        return '';
-      case 'orientation_task':
-        return <>
-          <span className="leading-relaxed break-all">
-            {item.questionKey === 'step_1' ? '端末年: ' : ''}
-            {item.questionKey === 'step_2' ? '端末月: ' : ''}
-            {item.questionKey === 'step_3' ? '端末日: ' : ''}
-            {item.questionKey === 'step_4' ? '端末曜日: ' : ''}
-            {item.questionKey === 'step_5' ? '端末時間: ' : ''}
-            {item.questionKey === 'step_6' ? '端末季節: ' : ''}
-            {!(item.questionKey === 'step_7' || item.questionKey === 'step_8') && typeof item.answer === 'string' ? item.answer && item.answer != 'unknown' ? item.answer : '' : ''}
-            {
-              (item.questionKey === 'step_7' || item.questionKey === 'step_8') && (
-                <span className="leading-relaxed break-all">
-                  {item.gpsDetail}
-                </span>
-              )
-            }
-          </span>
-        </>;
-      case 'node_test':
+      case "clock_validation":
+        return "";
+      case "subtraction_task":
+        return "";
+      case "shape_recall":
+        return "";
+      case "shape_match":
+        return "";
+      case "sentence_task":
+        return "";
+      case "simple_shape_selection":
+        return "";
+      case "naming_task":
+        return "";
+      case "word_recall":
+        return "";
+      case "sequence_recall":
+        return "";
+      case "sentence_task":
+        return "";
+      case "similarity_task":
+        return "";
+      case "delayed_recall":
+        return "";
+      case "orientation_task":
+        return (
+          <>
+            <span className="leading-relaxed break-all">
+              {item.questionKey === "step_1" ? "端末年: " : ""}
+              {item.questionKey === "step_2" ? "端末月: " : ""}
+              {item.questionKey === "step_3" ? "端末日: " : ""}
+              {item.questionKey === "step_4" ? "端末曜日: " : ""}
+              {item.questionKey === "step_5" ? "端末時間: " : ""}
+              {item.questionKey === "step_6" ? "端末季節: " : ""}
+              {!(item.questionKey === "step_7" || item.questionKey === "step_8") &&
+              typeof item.answer === "string"
+                ? item.answer && item.answer != "unknown"
+                  ? item.answer
+                  : ""
+                : ""}
+              {(item.questionKey === "step_7" || item.questionKey === "step_8") && (
+                <span className="leading-relaxed break-all">{item.gpsDetail}</span>
+              )}
+            </span>
+          </>
+        );
+      case "node_test":
         return "自己修復回数: " + (item?.repairCount || 0);
-      case 'letter_tap_task':
+      case "letter_tap_task":
         return item?.tapSummary;
-      case 'drawing_test':
-        return '';
+      case "drawing_test":
+        return "";
       default:
-        return typeof item.value === 'object' ? JSON.stringify(item.value) : (item.value || 'データが存在しません');
+        return typeof item.value === "object"
+          ? JSON.stringify(item.value)
+          : item.value || "データが存在しません";
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md p-0 border-0 shadow-2xl overflow-hidden rounded-2xl max-h-[calc(100vh-2rem)] overflow-y-auto">
-        <DialogHeader className="p-6 bg-neutral-50 border-b border-neutral-100">
-          <DialogTitle className="text-lg font-bold tracking-tight flex items-center gap-2">
-            <Info className="text-[#3f65b8] h-5 w-5" />
+      <DialogContent className="max-h-[calc(100vh-2rem)] max-w-md overflow-hidden overflow-y-auto rounded-2xl border-0 p-0 shadow-2xl">
+        <DialogHeader className="border-b border-neutral-100 bg-neutral-50 p-6">
+          <DialogTitle className="flex items-center gap-2 text-lg font-bold tracking-tight">
+            <Info className="h-5 w-5 text-[#3f65b8]" />
             {alls_test[`${item?.name}_${item?.no}`]}の回答確認
           </DialogTitle>
         </DialogHeader>
-        <div className="px-8 space-y-6 bg-white">
+        <div className="space-y-6 bg-white px-8">
           <div className="space-y-3">
-            <Label className="text-base font-bold text-neutral-400 uppercase tracking-widest">入力の結果</Label>
-            <div className="flex justify-center items-center bg-neutral-50 border border-neutral-500 rounded-xl p-5 text-sm font-medium text-neutral-800 shadow-inner whitespace-pre-wrap leading-relaxed min-h-[10px] font-mono">
+            <Label className="text-base font-bold tracking-widest text-neutral-400 uppercase">
+              入力の結果
+            </Label>
+            <div className="flex min-h-[10px] items-center justify-center rounded-xl border border-neutral-500 bg-neutral-50 p-5 font-mono text-sm leading-relaxed font-medium whitespace-pre-wrap text-neutral-800 shadow-inner">
               {renderTest(item)}
             </div>
           </div>
           <div className="space-y-3">
-            <Label className="text-base font-bold text-neutral-400 uppercase tracking-widest">参考情報</Label>
-            <div className="flex justify-center items-center bg-neutral-50 border border-neutral-500 rounded-xl p-5 text-sm font-medium text-neutral-800 shadow-inner whitespace-pre-wrap leading-relaxed min-h-[10px] font-mono">
+            <Label className="text-base font-bold tracking-widest text-neutral-400 uppercase">
+              参考情報
+            </Label>
+            <div className="flex min-h-[10px] items-center justify-center rounded-xl border border-neutral-500 bg-neutral-50 p-5 font-mono text-sm leading-relaxed font-medium whitespace-pre-wrap text-neutral-800 shadow-inner">
               {renderReference(item)}
             </div>
           </div>
 
           <div className="space-y-4 pb-4">
             <div className="flex items-center justify-between">
-              <Label className="text-base font-bold text-neutral-400 uppercase tracking-widest">判定の修正</Label>
+              <Label className="text-base font-bold tracking-widest text-neutral-400 uppercase">
+                判定の修正
+              </Label>
               <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-black text-[#3f65b8]">{item?.score || '0'}</span>
+                <span className="text-3xl font-black text-[#3f65b8]">{item?.score || "0"}</span>
                 <span className="text-xs font-bold text-neutral-400">点</span>
               </div>
             </div>
@@ -233,35 +262,36 @@ export const TestResultItemDialog: React.FC<TestResultItemDialogProps> = ({
 
                 const currentScore = Number(item.score) || 0;
                 let newScore = currentScore;
-                if(item?.taskKey === 'drawing_test') {
+                if (item?.taskKey === "drawing_test") {
                   newScore = 0;
                 } else {
-                  newScore = isCorrect ? currentScore + (item?.taskKey === 'orientation_task' ? 0.75 : 1) : Math.max(0, currentScore - (item?.taskKey === 'orientation_task' ? 0.75 : 1));
+                  newScore = isCorrect
+                    ? currentScore + (item?.taskKey === "orientation_task" ? 0.75 : 1)
+                    : Math.max(0, currentScore - (item?.taskKey === "orientation_task" ? 0.75 : 1));
                 }
 
                 onUpdate({
                   ...item,
                   isCorrect: isCorrect,
-                  score: newScore
+                  score: newScore,
                 });
               }}
             >
-              <SelectTrigger className="w-full h-12 bg-neutral-50 border-neutral-200">
+              <SelectTrigger className="h-12 w-full border-neutral-200 bg-neutral-50">
                 <SelectValue placeholder="判定を選択" />
               </SelectTrigger>
               <SelectContent className="border-neutral-200 shadow-xl">
-                <SelectItem value="true">
-                  OK
-                </SelectItem>
-                <SelectItem value="false">
-                  NG
-                </SelectItem>
+                <SelectItem value="true">OK</SelectItem>
+                <SelectItem value="false">NG</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
-        <DialogFooter className="p-6 bg-neutral-50 border-t border-neutral-100">
-          <Button onClick={() => onOpenChange(false)} className="w-full hover:bg-black text-white px-8 h-11 font-bold shadow-lg transition-all active:scale-95">
+        <DialogFooter className="border-t border-neutral-100 bg-neutral-50 p-6">
+          <Button
+            onClick={() => onOpenChange(false)}
+            className="h-11 w-full px-8 font-bold text-white shadow-lg transition-all hover:bg-black active:scale-95"
+          >
             閉じる
           </Button>
         </DialogFooter>

@@ -1,22 +1,22 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { Eye, EyeOff, AlertTriangle } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Eye, EyeOff, AlertTriangle } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { loginSchema } from '@/schemas';
-import { authService } from '@/services';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { useSearchParams } from 'next/navigation';
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { loginSchema } from "@/schemas";
+import { authService } from "@/services";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useSearchParams } from "next/navigation";
 
 interface LoginScreenProps {
   onLogin: () => void;
 }
 
-import { LoginForm } from './login/LoginForm';
+import { LoginForm } from "./login/LoginForm";
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,9 +24,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const errorParam = searchParams.get('error');
-    if (errorParam === 'unauthorized') {
-      setError('このアカウントには管理者権限がありません。');
+    const errorParam = searchParams.get("error");
+    if (errorParam === "unauthorized") {
+      setError("このアカウントには管理者権限がありません。");
     }
   }, [searchParams]);
 
@@ -38,31 +38,34 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
       onLogin();
     } catch (err: any) {
       console.error(err);
-      setError('メールアドレスまたはパスワードが正しくありません');
+      setError("メールアドレスまたはパスワードが正しくありません");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-neutral-50 p-4">
-      <Card className="w-full max-w-md shadow-lg border-neutral-200 overflow-hidden">
-        <CardHeader className="bg-[#3f65b8] text-white p-6">
-          <CardTitle className="text-xl font-semibold text-center uppercase tracking-wide">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-neutral-50 p-4">
+      <Card className="w-full max-w-md overflow-hidden border-neutral-200 shadow-lg">
+        <CardHeader className="bg-[#3f65b8] p-6 text-white">
+          <CardTitle className="text-center text-xl font-semibold tracking-wide uppercase">
             ログイン
           </CardTitle>
         </CardHeader>
         <CardContent className="p-8 pb-0">
           {error && (
-            <div className="mb-6 p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-xs font-medium flex items-center gap-2 animate-in fade-in zoom-in-95">
+            <div className="animate-in fade-in zoom-in-95 mb-6 flex items-center gap-2 rounded-lg border border-red-100 bg-red-50 p-3 text-xs font-medium text-red-600">
               <AlertTriangle size={14} />
               {error}
             </div>
           )}
           <LoginForm onSubmit={onSubmit} isSubmitting={isSubmitting} />
         </CardContent>
-        <CardFooter className="p-8 pt-4 flex flex-col items-center">
-          <a href="#" className="text-sm text-[#3f65b8] hover:underline hover:text-[#345399] decoration-2 transition-all font-medium">
+        <CardFooter className="flex flex-col items-center p-8 pt-4">
+          <a
+            href="#"
+            className="text-sm font-medium text-[#3f65b8] decoration-2 transition-all hover:text-[#345399] hover:underline"
+          >
             パスワードをお忘れの方はこちら
           </a>
         </CardFooter>
